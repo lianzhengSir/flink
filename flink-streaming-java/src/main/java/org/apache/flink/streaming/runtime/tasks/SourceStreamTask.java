@@ -231,7 +231,7 @@ public class SourceStreamTask<
     }
 
     // ------------------------------------------------------------------------
-    //  Checkpointing
+    //  Checkpointing,其checkpint的执行由jobmaster发送的checkpoint消息触发
     // ------------------------------------------------------------------------
 
     @Override

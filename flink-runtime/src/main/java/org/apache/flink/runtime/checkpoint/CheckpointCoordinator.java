@@ -87,7 +87,7 @@ import static org.apache.flink.util.ExceptionUtils.findThrowable;
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-/**
+/**协调operators和state的分布式快照。它通过向相关的tasks发送触发消息和从各tasks收集确认消息（Ack）来完成checkpoint。同时，它还收集和维护各个tasks上报的状态句柄/状态引用（state handles）
  * The checkpoint coordinator coordinates the distributed snapshots of operators and state. It
  * triggers the checkpoint by sending the messages to the relevant tasks and collects the checkpoint
  * acknowledgements. It also collects and maintains the overview of the state handles reported by

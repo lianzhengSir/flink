@@ -1056,7 +1056,7 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>> extends Ab
         resetSynchronousSavepointId(checkpointId, false);
         subtaskCheckpointCoordinator.abortCheckpointOnBarrier(checkpointId, cause, operatorChain);
     }
-
+    //调用prepareSnapshotPreBarrier方法
     private boolean performCheckpoint(
             CheckpointMetaData checkpointMetaData,
             CheckpointOptions checkpointOptions,

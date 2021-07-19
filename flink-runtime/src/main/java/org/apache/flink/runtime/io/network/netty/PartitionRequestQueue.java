@@ -45,7 +45,7 @@ import java.util.function.Consumer;
 
 import static org.apache.flink.runtime.io.network.netty.NettyMessage.BufferResponse;
 
-/**
+/**主要负责向Client端发送BufferResponse数据通知其消费当满足有可用数据时。通知下游inputChannel通过CreditBasedPartitionRequestClientHandler消费发送过来的Buffer或Event
  * A nonEmptyReader of partition queues, which listens for channel writability changed events before
  * writing and flushing {@link Buffer} instances.
  */
@@ -59,7 +59,7 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
     /** The readers which are already enqueued available for transferring data. */
     private final ArrayDeque<NetworkSequenceViewReader> availableReaders = new ArrayDeque<>();
 
-    /** All the readers created for the consumers' partition requests. */
+    /** All the readers created for the consumers' partition requests.allReaders存储的是已注册过来的远程分区客户端集合 */
     private final ConcurrentMap<InputChannelID, NetworkSequenceViewReader> allReaders =
             new ConcurrentHashMap<>();
 
@@ -75,7 +75,7 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
 
         super.channelRegistered(ctx);
     }
-
+    //触发当前PartitionRequestQueue的 UserEventTriggered 方法
     void notifyReaderNonEmpty(final NetworkSequenceViewReader reader) {
         // The notification might come from the same thread. For the initial writes this
         // might happen before the reader has set its reference to the view, because
@@ -103,8 +103,8 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
         // Queue an available reader for consumption. If the queue is empty,
         // we try trigger the actual write. Otherwise this will be handled by
         // the writeAndFlushNextMessageIfPossible calls.
-        boolean triggerWrite = availableReaders.isEmpty();
-        registerAvailableReader(reader);
+        boolean triggerWrite = availableReaders.isEmpty();//存放的是可往下游写的NetworkSequenceViewReader
+        registerAvailableReader(reader);//调用下方registerAvailableReader时会把当前reader添加进去，当后面往下游写数据时会从availableReaders.poll出来
 
         if (triggerWrite) {
             writeAndFlushNextMessageIfPossible(ctx.channel());
@@ -152,11 +152,11 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
         if (fatalError) {
             return;
         }
-
+        //allReaders存储的是已注册过来的远程分区客户端集合
         NetworkSequenceViewReader reader = allReaders.get(receiverId);
         if (reader != null) {
             operation.accept(reader);
-
+            //增加credit后继续向下游发送数据
             enqueueAvailableReader(reader);
         } else {
             throw new IllegalStateException(
@@ -192,7 +192,7 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         writeAndFlushNextMessageIfPossible(ctx.channel());
     }
-
+    //从reader中Poll出BufferAndAvailability 并封装成BufferResponse发送至Client端，Client会调用channelRead接受处理
     private void writeAndFlushNextMessageIfPossible(final Channel channel) throws IOException {
         if (fatalError || !channel.isWritable()) {
             return;
@@ -233,14 +233,14 @@ class PartitionRequestQueue extends ChannelInboundHandlerAdapter {
                     if (next.moreAvailable()) {
                         registerAvailableReader(reader);
                     }
-
+                    //生成BufferResponse写入实例
                     BufferResponse msg =
                             new BufferResponse(
                                     next.buffer(),
                                     next.getSequenceNumber(),
                                     reader.getReceiverId(),
                                     next.buffersInBacklog());
-
+                    //向channel中写入BufferResponse并添加一个future回调接口，回调接口根据返会的future类型做出对应动作
                     // Write and flush and wait until this is done before
                     // trying to continue with the next buffer.
                     channel.writeAndFlush(msg).addListener(writeListener);

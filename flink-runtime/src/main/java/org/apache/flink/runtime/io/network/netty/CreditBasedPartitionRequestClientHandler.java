@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-/**
+/**主要负责接收PartitionRequestQueue的通知并消费其ResultSubpatitionView的Deque中的Buffer或Event
  * Channel handler to read the messages of buffer response or error response from the producer, to
  * write and flush the unannounced credits for the producer.
  *
@@ -280,7 +280,7 @@ class CreditBasedPartitionRequestClientHandler extends ChannelInboundHandlerAdap
             }
         }
     }
-
+    //消息类型主要是两种：BufferResponse 和 ErrorResponse
     private void decodeMsg(Object msg) throws Throwable {
         final Class<?> msgClazz = msg.getClass();
 
@@ -298,7 +298,7 @@ class CreditBasedPartitionRequestClientHandler extends ChannelInboundHandlerAdap
             }
 
             try {
-                decodeBufferOrEvent(inputChannel, bufferOrEvent);
+                decodeBufferOrEvent(inputChannel, bufferOrEvent);//正常情况下开始处理buffer
             } catch (Throwable t) {
                 inputChannel.onError(t);
             }

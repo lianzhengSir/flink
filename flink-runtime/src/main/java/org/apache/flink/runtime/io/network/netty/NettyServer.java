@@ -69,7 +69,7 @@ class NettyServer {
     int init(final NettyProtocol protocol, NettyBufferPool nettyBufferPool) throws IOException {
         return init(
                 nettyBufferPool,
-                sslHandlerFactory -> new ServerChannelInitializer(protocol, sslHandlerFactory));
+                sslHandlerFactory -> new ServerChannelInitializer(protocol, sslHandlerFactory));////初始化生成server端的ChannelHandler
     }
 
     int init(

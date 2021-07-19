@@ -73,7 +73,7 @@ public class NettyProtocol {
      * @return channel handlers
      */
     public ChannelHandler[] getServerChannelHandlers() {
-        PartitionRequestQueue queueOfPartitionQueues = new PartitionRequestQueue();
+        PartitionRequestQueue queueOfPartitionQueues = new PartitionRequestQueue();//ChannelInboundHandlerAdapter，主要负责向Client端发送BufferResponse数据 通知其消费
         PartitionRequestServerHandler serverHandler =
                 new PartitionRequestServerHandler(
                         partitionProvider, taskEventPublisher, queueOfPartitionQueues);

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import static org.apache.flink.runtime.io.network.netty.NettyMessage.PartitionRequest;
 import static org.apache.flink.runtime.io.network.netty.NettyMessage.TaskEventRequest;
 
-/** Channel handler to initiate data transfers and dispatch backwards flowing task events. */
+/** Channel handler to initiate data transfers and dispatch backwards flowing task events.主要负责处理接收Client端的数据，比如PartitionRequest的申请需求 */
 class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PartitionRequestServerHandler.class);
@@ -76,7 +76,7 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
             // ----------------------------------------------------------------
             // Intermediate result partition requests
             // ----------------------------------------------------------------
-            if (msgClazz == PartitionRequest.class) {
+            if (msgClazz == PartitionRequest.class) {//Subpartition发送过来的注册请求
                 PartitionRequest request = (PartitionRequest) msg;
 
                 LOG.debug("Read channel on {}: {}.", ctx.channel().localAddress(), request);
@@ -90,7 +90,7 @@ class PartitionRequestServerHandler extends SimpleChannelInboundHandler<NettyMes
                     reader.requestSubpartitionView(
                             partitionProvider, request.partitionId, request.queueIndex);
 
-                    outboundQueue.notifyReaderCreated(reader);
+                    outboundQueue.notifyReaderCreated(reader);//注册到outboundQueue中
                 } catch (PartitionNotFoundException notFound) {
                     respondWithError(ctx, notFound, request.receiverId);
                 }

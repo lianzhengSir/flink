@@ -78,7 +78,7 @@ public class RemoteInputChannel extends InputChannel {
 
     /**
      * The received buffers. Received buffers are enqueued by the network I/O thread and the queue
-     * is consumed by the receiving task thread.
+     * is consumed by the receiving task thread.存放的是待消费的Buffer的双端队列
      */
     private final PrioritizedDeque<SequenceBuffer> receivedBuffers = new PrioritizedDeque<>();
 

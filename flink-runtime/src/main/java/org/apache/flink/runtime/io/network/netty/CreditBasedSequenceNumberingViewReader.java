@@ -59,7 +59,7 @@ class CreditBasedSequenceNumberingViewReader
      * thread only since there is no synchronisation.
      */
     private boolean isRegisteredAsAvailable = false;
-
+    //下游inputChannel中可用buffer个数,如果等于0说明下游已经无buffer可用了，此时停止往下游发送数据
     /** The number of available buffers for holding data on the consumer side. */
     private int numCreditsAvailable;
 
@@ -67,7 +67,7 @@ class CreditBasedSequenceNumberingViewReader
             InputChannelID receiverId, int initialCredit, PartitionRequestQueue requestQueue) {
 
         this.receiverId = receiverId;
-        this.numCreditsAvailable = initialCredit;
+        this.numCreditsAvailable = initialCredit;//initialCredit个数对应参数taskmanager.network.memory.buffers-per-channel，默认2,这也是下游LocalBufferPool向InputChannel分配的至少能满足的初始容量
         this.requestQueue = requestQueue;
     }
 

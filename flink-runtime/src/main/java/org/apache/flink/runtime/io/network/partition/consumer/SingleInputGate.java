@@ -286,9 +286,9 @@ public class SingleInputGate extends IndexedInputGate {
                                             + "channels [%s].",
                                     inputChannels.size(), numberOfInputChannels));
                 }
-
+                //初始化inputChannel，本地数据传输为LocalInputChannel，远程为RemoteInputChannel.
                 convertRecoveredInputChannels();
-                internalRequestPartitions();
+                internalRequestPartitions();//比如RemoteInputChannel，遍历每个inputChannel，连接远程分区Channel后创建PartitionRequestClient客户端;通过PartitionRequestClient向server端申请subpartition注册
             }
 
             requestedPartitionsFlag = true;
@@ -319,7 +319,7 @@ public class SingleInputGate extends IndexedInputGate {
     private void internalRequestPartitions() {
         for (InputChannel inputChannel : inputChannels.values()) {
             try {
-                inputChannel.requestSubpartition(consumedSubpartitionIndex);
+                inputChannel.requestSubpartition(consumedSubpartitionIndex);//inputChannel向指定consumedSubpartitionIndex（subpartitionIndex）注册requestSubpartition
             } catch (Throwable t) {
                 inputChannel.setError(t);
                 return;

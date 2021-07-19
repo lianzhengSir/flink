@@ -558,7 +558,7 @@ public abstract class FlinkKafkaConsumerBase<T> extends RichParallelSourceFuncti
 
     @Override
     public void open(Configuration configuration) throws Exception {
-        // determine the offset commit mode
+        // determine the offset commit mode,如果打开checkpoint，offest会记录在snapshot中，否则offset会定期写回kafka topic，如果是disabled，就不会提交offset
         this.offsetCommitMode =
                 OffsetCommitModes.fromConfiguration(
                         getIsAutoCommitEnabled(),
@@ -575,7 +575,7 @@ public abstract class FlinkKafkaConsumerBase<T> extends RichParallelSourceFuncti
 
         subscribedPartitionsToStartOffsets = new HashMap<>();
         final List<KafkaTopicPartition> allPartitions = partitionDiscoverer.discoverPartitions();
-        if (restoredState != null) {
+        if (restoredState != null) {//判断是否有可恢复的state信息
             for (KafkaTopicPartition partition : allPartitions) {
                 if (!restoredState.containsKey(partition)) {
                     restoredState.put(partition, KafkaTopicPartitionStateSentinel.EARLIEST_OFFSET);
