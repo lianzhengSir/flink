@@ -73,7 +73,7 @@ class LocalBufferPool implements BufferPool {
     /** The minimum number of required segments for this pool. */
     private final int numberOfRequiredMemorySegments;
 
-    /**
+    /**当前可用的内存段，这些内存段已从网络缓冲池中请求到本地，但当前没有被当做缓冲区用于数据传输
      * The currently available memory segments. These are segments, which have been requested from
      * the network buffer pool and are currently not handed out as Buffer instances.
      *
