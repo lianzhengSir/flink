@@ -1277,20 +1277,6 @@ under the License.
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.4</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-enforcer-plugin</artifactId>
 						<executions>
 							<execution>
@@ -1302,7 +1288,7 @@ under the License.
 									<rules>
 										<requireMavenVersion>
 											<!-- maven version must be lower than 3.3. See FLINK-3158 -->
-											<version>(,3.3)</version>
+											<version>(,3.6)</version>
 										</requireMavenVersion>
 										<requireJavaVersion>
 											<version>1.8.0</version>
@@ -1327,6 +1313,20 @@ under the License.
 				</plugins>
 				<pluginManagement>
 					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-gpg-plugin</artifactId>
+							<version>1.4</version>
+							<executions>
+								<execution>
+									<id>sign-artifacts</id>
+									<phase>verify</phase>
+									<goals>
+										<goal>sign</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-release-plugin</artifactId>
